@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StyleWeather</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07050f;--surface:#0e0b1a;--card:#141020;--p1:#b44fff;--p2:#7c3aed;--p3:#e040fb;--p4:#06d6ff;--text:#f0ecff;--muted:#7a6a9a;--border:rgba(180,79,255,0.18);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.aurora-blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.18;animation:auroraMove ease-in-out infinite;}
+.ab1{width:700px;height:700px;background:radial-gradient(circle,var(--p1),transparent);top:-200px;left:-200px;animation-duration:18s;}
+.ab2{width:600px;height:600px;background:radial-gradient(circle,var(--p2),transparent);bottom:-150px;right:-150px;animation-duration:14s;animation-delay:-7s;}
+.ab3{width:500px;height:500px;background:radial-gradient(circle,var(--p4),transparent);top:40%;left:40%;animation-duration:20s;animation-delay:-4s;opacity:0.12;}
+.ab4{width:400px;height:400px;background:radial-gradient(circle,var(--p3),transparent);top:10%;right:10%;animation-duration:16s;animation-delay:-10s;opacity:0.1;}
+@keyframes auroraMove{0%{transform:translate(0,0) scale(1);}25%{transform:translate(60px,-40px) scale(1.1);}50%{transform:translate(-30px,60px) scale(0.95);}75%{transform:translate(40px,20px) scale(1.05);}100%{transform:translate(0,0) scale(1);}}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:0;transform:scale(0.5);}50%{opacity:1;transform:scale(1);}}
+#particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.particle{position:absolute;border-radius:50%;animation:floatUp linear infinite;opacity:0;}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0;}15%{opacity:0.8;}85%{opacity:0.3;}100%{transform:translateY(-5vh) scale(1.5);opacity:0;}}
+#loginPage{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-box{position:relative;z-index:1;background:rgba(14,11,26,0.88);backdrop-filter:blur(40px);border:1px solid rgba(180,79,255,0.3);border-radius:32px;padding:50px 42px;width:430px;animation:loginReveal .9s cubic-bezier(.16,1,.3,1) forwards;opacity:0;transform:translateY(50px) scale(0.95);box-shadow:0 0 0 1px rgba(180,79,255,0.1),0 40px 80px rgba(0,0,0,0.7),0 0 80px rgba(124,58,237,0.15),inset 0 1px 0 rgba(255,255,255,0.06);}
+@keyframes loginReveal{to{opacity:1;transform:translateY(0) scale(1);}}
+.login-box::before{content:'';position:absolute;inset:-1px;border-radius:33px;background:linear-gradient(135deg,rgba(180,79,255,0.4),rgba(6,214,255,0.2),rgba(224,64,251,0.3),rgba(124,58,237,0.4));z-index:-1;animation:borderGlow 4s linear infinite;background-size:300% 300%;}
+@keyframes borderGlow{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+.login-box::after{content:'';position:absolute;inset:1px;border-radius:32px;background:rgba(14,11,26,0.95);z-index:-1;}
+.brand{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;background:linear-gradient(135deg,var(--p1),var(--p4),var(--p3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px;animation:brandShimmer 3s ease-in-out infinite;background-size:200% 200%;}
+@keyframes brandShimmer{0%,100%{background-position:0% 50%;filter:brightness(1);}50%{background-position:100% 50%;filter:brightness(1.3);}}
+.brand-sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:30px;}
+.wicons{display:flex;justify-content:center;gap:18px;font-size:30px;margin-bottom:26px;}
+.wicons span{animation:iconDance 3s ease-in-out infinite;display:inline-block;filter:drop-shadow(0 0 8px rgba(180,79,255,0.5));}
+.wicons span:nth-child(1){animation-delay:0s;}
+.wicons span:nth-child(2){animation-delay:.5s;}
+.wicons span:nth-child(3){animation-delay:1s;}
+.wicons span:nth-child(4){animation-delay:1.5s;}
+@keyframes iconDance{0%,100%{transform:translateY(0) rotate(0deg) scale(1);}30%{transform:translateY(-10px) rotate(8deg) scale(1.1);}60%{transform:translateY(-5px) rotate(-4deg) scale(1.05);}}
+.lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:2px;display:block;margin-bottom:7px;}
+.inp{width:100%;background:rgba(180,79,255,0.06);border:1px solid rgba(180,79,255,0.2);border-radius:14px;padding:14px 17px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;margin-bottom:14px;transition:all .35s;}
+.inp:focus{border-color:var(--p1);background:rgba(180,79,255,0.1);box-shadow:0 0 0 3px rgba(180,79,255,0.15);}
+.btn-primary{width:100%;padding:15px;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,var(--p2),var(--p1),var(--p3));color:#fff;font-weight:700;font-size:15px;transition:all .35s;position:relative;overflow:hidden;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,58,237,0.4);}
+.btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.15),transparent);transform:translateX(-100%) skewX(-15deg);transition:transform .6s;}
+.btn-primary:hover::before{transform:translateX(200%) skewX(-15deg);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(180,79,255,0.5);}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:12px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(180,79,255,0.3),transparent);}
+.btn-outline{width:100%;padding:13px;border:1px solid rgba(180,79,255,0.25);border-radius:14px;cursor:pointer;background:transparent;color:var(--text);font-size:14px;transition:all .3s;}
+.btn-outline:hover{border-color:var(--p1);color:var(--p1);background:rgba(180,79,255,0.06);transform:translateY(-1px);}
+#app{display:none;position:relative;z-index:1;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:498;opacity:0;pointer-events:none;transition:opacity .4s;backdrop-filter:blur(6px);}
+.overlay.on{opacity:1;pointer-events:all;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:285px;background:rgba(10,8,20,0.97);backdrop-filter:blur(40px);border-right:1px solid var(--border);z-index:499;transform:translateX(-100%);transition:transform .45s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;box-shadow:20px 0 60px rgba(0,0,0,0.6);}
+.sidebar.on{transform:translateX(0);}
+.sb-head{padding:26px 20px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.sb-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sb-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.sb-close:hover{background:rgba(180,79,255,0.1);color:var(--p1);}
+.sb-profile{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:13px;}
+.avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--p2),var(--p1),var(--p3));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;animation:avatarPulse 3s ease-in-out infinite;}
+@keyframes avatarPulse{0%,100%{box-shadow:0 0 0 3px rgba(180,79,255,0.2),0 4px 20px rgba(124,58,237,0.4);}50%{box-shadow:0 0 0 6px rgba(180,79,255,0.15),0 4px 30px rgba(180,79,255,0.5);}}
+.sb-nav{flex:1;padding:14px 10px;}
+.ni{display:flex;align-items:center;gap:13px;padding:13px 15px;border-radius:14px;cursor:pointer;color:var(--muted);font-size:14px;font-weight:500;margin-bottom:4px;transition:all .25s;position:relative;overflow:hidden;}
+.ni::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--p1),var(--p3));border-radius:0 3px 3px 0;transform:scaleY(0);transition:transform .3s;}
+.ni:hover{background:rgba(180,79,255,0.08);color:var(--text);padding-left:20px;}
+.ni:hover::before{transform:scaleY(1);}
+.ni .ic{font-size:18px;width:22px;text-align:center;}
+.ni .bdg{margin-left:auto;background:linear-gradient(135deg,var(--p1),var(--p3));color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;}
+.sb-foot{padding:10px 10px 22px;border-top:1px solid var(--border);}
+.ni-red{color:#e05555!important;}
+.ni-red:hover{background:rgba(224,85,85,0.08)!important;}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(7,5,15,0.88);backdrop-filter:blur(30px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:64px;box-shadow:0 4px 30px rgba(0,0,0,0.4);}
+.hbg{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:5px;padding:8px;border-radius:10px;transition:background .2s;}
+.hbg:hover{background:rgba(180,79,255,0.08);}
+.hbg span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s;}
+.hbg:hover span{background:var(--p1);}
+.tb-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tb-wx{display:flex;align-items:center;gap:7px;background:rgba(180,79,255,0.08);border:1px solid rgba(180,79,255,0.2);border-radius:22px;padding:7px 15px;font-size:13px;font-weight:600;}
+.main{padding:24px 16px;max-width:900px;margin:0 auto;}
+.page-enter{animation:pageSlide .45s cubic-bezier(.16,1,.3,1) forwards;}
+@keyframes pageSlide{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.loc-row{display:flex;gap:10px;margin-bottom:22px;}
+.loc-inp{flex:1;background:rgba(180,79,255,0.06);border:1px solid var(--border);border-radius:14px;padding:14px 17px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:all .3s;}
+.loc-inp:focus{border-color:var(--p1);background:rgba(180,79,255,0.1);box-shadow:0 0 0 3px rgba(180,79,255,0.12);}
+.btn-wx{padding:14px 18px;border:none;border-radius:14px;cursor:pointer;background:linear-gradient(135deg,var(--p2),var(--p1));color:#fff;font-weight:700;font-size:14px;white-space:nowrap;transition:all .35s;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(124,58,237,0.35);}
+.btn-wx:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(180,79,255,0.45);}
+.wx-card{background:linear-gradient(135deg,#0a0518,#0d0a1e,#070518);border:1px solid rgba(180,79,255,0.2);border-radius:28px;padding:26px;margin-bottom:24px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.wx-card::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(180,79,255,0.12),transparent 60%);pointer-events:none;animation:wxGlow 6s ease-in-out infinite;}
+.wx-card::after{content:'';position:absolute;bottom:-30%;left:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(6,214,255,0.08),transparent 60%);pointer-events:none;animation:wxGlow 8s ease-in-out infinite reverse;}
+@keyframes wxGlow{0%,100%{opacity:0.6;transform:scale(1);}50%{opacity:1;transform:scale(1.15);}}
+.wx-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;}
+.wx-temp{font-family:'Playfair Display',serif;font-size:68px;font-weight:900;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.wx-temp sup{font-size:26px;}
+.wx-desc{color:var(--muted);margin-top:7px;font-size:15px;}
+.wx-loc{font-size:13px;margin-top:6px;color:rgba(240,236,255,0.6);}
+.wx-ico{font-size:72px;animation:weatherSpin 5s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(180,79,255,0.4));}
+@keyframes weatherSpin{0%,100%{transform:translateY(0) rotate(-5deg) scale(1);}25%{transform:translateY(-15px) rotate(5deg) scale(1.1);}75%{transform:translateY(-8px) rotate(-2deg) scale(1.05);}}
+.wx-dets{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;position:relative;z-index:1;}
+.wx-det{background:rgba(180,79,255,0.07);border:1px solid rgba(180,79,255,0.15);border-radius:14px;padding:10px 15px;font-size:12px;transition:all .3s;}
+.wx-det:hover{background:rgba(180,79,255,0.15);transform:translateY(-3px);}
+.sec{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--text),rgba(180,79,255,0.8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(180,79,255,0.3),transparent);-webkit-background-clip:unset;background-clip:unset;}
+.outfit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:26px;}
+@media(min-width:500px){.outfit-grid{grid-template-columns:repeat(4,1fr);}}
+.oc{background:var(--card);border:2px solid var(--border);border-radius:22px;overflow:hidden;text-align:center;transition:all .4s cubic-bezier(.16,1,.3,1);animation:cardPop .5s cubic-bezier(.16,1,.3,1) forwards;opacity:0;}
+.oc:nth-child(1){animation-delay:.05s;}.oc:nth-child(2){animation-delay:.12s;}.oc:nth-child(3){animation-delay:.19s;}.oc:nth-child(4){animation-delay:.26s;}
+@keyframes cardPop{from{opacity:0;transform:translateY(25px) scale(0.93);}to{opacity:1;transform:translateY(0) scale(1);}}
+.oc:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 30px rgba(180,79,255,0.15);}
+.oc-imgwrap{width:100%;aspect-ratio:1;overflow:hidden;background:rgba(180,79,255,0.04);display:flex;align-items:center;justify-content:center;position:relative;}
+.oc-imgwrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s;}
+.oc:hover .oc-imgwrap img{transform:scale(1.1);}
+.oc-emoji{font-size:58px;animation:emojiPulse 3s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(180,79,255,0.4));}
+@keyframes emojiPulse{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-8px) scale(1.1);}}
+.oc-body{padding:12px 8px 14px;}
+.oc-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);}
+.oc-name{font-size:12px;font-weight:600;margin-top:5px;color:var(--text);}
+.oc-tip{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.oc-badge{display:inline-block;font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:6px;background:rgba(180,79,255,0.12);color:var(--p1);border:1px solid rgba(180,79,255,0.25);}
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:13px;margin-bottom:28px;}
+.food-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:16px 12px;text-align:center;transition:all .35s;animation:fadeUp .4s ease forwards;opacity:0;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.food-card:hover{transform:translateY(-6px) scale(1.04);box-shadow:0 15px 40px rgba(0,0,0,0.4);}
+.food-emoji{font-size:40px;margin-bottom:10px;display:block;animation:foodSpin 3s ease-in-out infinite;}
+@keyframes foodSpin{0%,100%{transform:scale(1);}50%{transform:scale(1.2) rotate(8deg);}}
+.food-name{font-size:13px;font-weight:600;}
+.food-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.food-badge{display:inline-block;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:7px;border:1px solid;}
+.health-box{background:var(--card);border-radius:22px;overflow:hidden;margin-bottom:28px;border:1px solid var(--border);}
+.health-head{padding:18px 22px;display:flex;align-items:center;gap:15px;}
+.health-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 18px;}
+@media(min-width:500px){.health-grid{grid-template-columns:repeat(3,1fr);}}
+.hi{background:rgba(180,79,255,0.04);border:1px solid rgba(180,79,255,0.1);border-radius:16px;padding:14px;transition:all .3s;animation:fadeUp .4s ease forwards;opacity:0;}
+.hi:hover{background:rgba(180,79,255,0.08);transform:translateY(-3px);}
+.hi-icon{font-size:26px;margin-bottom:7px;}
+.hi-name{font-size:12px;font-weight:700;}
+.hi-desc{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.hi-lvl{display:inline-block;font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:6px;}
+.lh{background:rgba(224,85,85,0.12);color:#e05555;border:1px solid rgba(224,85,85,0.2);}
+.lm{background:rgba(180,79,255,0.12);color:var(--p1);border:1px solid rgba(180,79,255,0.2);}
+.ll{background:rgba(6,214,255,0.1);color:var(--p4);border:1px solid rgba(6,214,255,0.2);}
+.dg-card{background:var(--card);border:1px solid var(--border);border-radius:20px;margin-bottom:12px;overflow:hidden;transition:all .3s;}
+.dg-card:hover{border-color:rgba(180,79,255,0.3);}
+.dg-head{display:flex;align-items:center;gap:13px;padding:16px 18px;cursor:pointer;transition:background .2s;}
+.dg-head:hover{background:rgba(180,79,255,0.04);}
+.dg-emoji{font-size:28px;transition:transform .3s;}
+.dg-head:hover .dg-emoji{transform:scale(1.25) rotate(10deg);}
+.dg-info{flex:1;}
+.dg-name{font-size:14px;font-weight:700;}
+.dg-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.dg-arrow{color:var(--muted);font-size:12px;transition:transform .35s;}
+.dg-arrow.open{transform:rotate(180deg);}
+.dg-body{display:none;padding:0 18px 16px;animation:slideDown .3s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-12px);}to{opacity:1;transform:translateY(0);}}
+.dg-body.open{display:block;}
+.dg-row{padding:10px 0;border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+.dg-row:last-child{border-bottom:none;}
+.dg-wx{font-size:12px;font-weight:700;min-width:130px;padding-top:2px;}
+.dg-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.dt{font-size:10px;font-weight:600;padding:3px 10px;border-radius:12px;}
+.dt-red{background:rgba(224,85,85,0.1);color:#e05555;border:1px solid rgba(224,85,85,0.18);}
+.dt-yellow{background:rgba(180,79,255,0.08);color:var(--p1);border:1px solid rgba(180,79,255,0.18);}
+.dt-green{background:rgba(6,214,255,0.08);color:var(--p4);border:1px solid rgba(6,214,255,0.18);}
+.wardrobe-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:16px;margin-bottom:28px;}
+.wcat{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px;transition:all .35s;}
+.wcat:hover{border-color:rgba(180,79,255,0.25);box-shadow:0 10px 35px rgba(124,58,237,0.1);}
+.wcat-head{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+.wcat-emoji{font-size:24px;transition:transform .3s;}
+.wcat:hover .wcat-emoji{transform:scale(1.2) rotate(-8deg);}
+.wcat-title{font-size:14px;font-weight:600;}
+.wcat-count{margin-left:auto;font-size:11px;color:var(--muted);background:rgba(180,79,255,0.08);padding:3px 10px;border-radius:20px;}
+.drop{border:2px dashed rgba(180,79,255,0.2);border-radius:16px;padding:20px 12px;text-align:center;cursor:pointer;transition:all .35s;}
+.drop:hover{border-color:var(--p1);background:rgba(180,79,255,0.05);transform:scale(1.02);}
+.drop input{display:none;}
+.drop-ico{font-size:28px;margin-bottom:7px;transition:transform .3s;}
+.drop:hover .drop-ico{transform:scale(1.4) rotate(15deg);}
+.drop-txt{font-size:11px;color:var(--muted);}
+.photo-list{margin-top:12px;display:flex;flex-direction:column;gap:9px;}
+.photo-item{display:flex;align-items:flex-start;gap:11px;background:rgba(180,79,255,0.04);border:1px solid var(--border);border-radius:14px;padding:10px 12px;transition:all .3s;animation:itemSlide .3s ease forwards;}
+@keyframes itemSlide{from{opacity:0;transform:translateX(-15px);}to{opacity:1;transform:translateX(0);}}
+.photo-item:hover{border-color:rgba(180,79,255,0.25);background:rgba(180,79,255,0.07);}
+.photo-item img{width:52px;height:52px;border-radius:12px;object-fit:cover;flex-shrink:0;transition:transform .3s;}
+.photo-item:hover img{transform:scale(1.08);}
+.photo-item-info{flex:1;min-width:0;}
+.photo-item-name{font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tag-row{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.tag-btn{font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid rgba(180,79,255,0.2);background:transparent;color:var(--muted);cursor:pointer;transition:all .25s;white-space:nowrap;}
+.tag-btn:hover{border-color:var(--p1);color:var(--p1);transform:translateY(-1px);}
+.tag-btn.sel{color:#0a0a0f!important;transform:translateY(-1px);}
+.tag-btn.sel.f-cotton{background:#e07b39;border-color:#e07b39;box-shadow:0 3px 12px rgba(224,123,57,0.4);}
+.tag-btn.sel.f-linen{background:#d4b020;border-color:#d4b020;box-shadow:0 3px 12px rgba(212,176,32,0.4);}
+.tag-btn.sel.f-polyester{background:#4090d0;border-color:#4090d0;box-shadow:0 3px 12px rgba(64,144,208,0.4);}
+.tag-btn.sel.f-lycra{background:#9060d0;border-color:#9060d0;box-shadow:0 3px 12px rgba(144,96,208,0.4);}
+.tag-btn.sel.f-wool{background:#5070ff;border-color:#5070ff;box-shadow:0 3px 12px rgba(80,112,255,0.4);}
+.tag-btn.sel.f-fleece{background:#3080c0;border-color:#3080c0;box-shadow:0 3px 12px rgba(48,128,192,0.4);}
+.tag-btn.sel.f-denim{background:#406090;border-color:#406090;box-shadow:0 3px 12px rgba(64,96,144,0.4);}
+.tag-btn.sel.f-silk{background:#c060a0;border-color:#c060a0;box-shadow:0 3px 12px rgba(192,96,160,0.4);}
+.tag-btn.sel.f-nylon{background:#40a080;border-color:#40a080;box-shadow:0 3px 12px rgba(64,160,128,0.4);}
+.fabric-suggest{background:linear-gradient(135deg,rgba(180,79,255,0.08),rgba(6,214,255,0.04));border:1px solid rgba(180,79,255,0.2);border-radius:18px;padding:15px 20px;margin-bottom:20px;font-size:13px;color:var(--muted);}
+.fabric-suggest strong{color:var(--p1);}
+.fab-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.fab-chip{font-size:11px;font-weight:700;padding:5px 13px;border-radius:20px;border:1px solid;transition:all .3s;}
+.fab-chip:hover{transform:translateY(-2px);filter:brightness(1.2);}
+.photo-del{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:3px 7px;flex-shrink:0;border-radius:8px;transition:all .2s;}
+.photo-del:hover{color:#e05555;background:rgba(224,85,85,0.1);}
+#collectionsPage{display:none;}
+.ctabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.ctab{padding:8px 17px;border-radius:22px;border:1px solid var(--border);cursor:pointer;font-size:12px;color:var(--muted);background:none;transition:all .25s;}
+.ctab:hover{border-color:rgba(180,79,255,0.3);color:var(--text);}
+.ctab.on{border-color:var(--p1);color:var(--p1);background:rgba(180,79,255,0.08);box-shadow:0 4px 15px rgba(180,79,255,0.15);}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;}
+.col-item{border-radius:16px;overflow:hidden;border:1px solid var(--border);transition:all .35s;animation:cardPop .4s ease forwards;}
+.col-item:hover{transform:translateY(-5px);box-shadow:0 15px 35px rgba(0,0,0,0.4);border-color:rgba(180,79,255,0.25);}
+.col-item img{width:100%;aspect-ratio:1;object-fit:cover;display:block;transition:transform .4s;}
+.col-item:hover img{transform:scale(1.1);}
+.col-item-info{padding:8px 10px;background:var(--card);}
+.col-item-cat{font-size:9px;text-transform:uppercase;color:var(--muted);letter-spacing:1px;}
+.col-item-tag{font-size:10px;font-weight:600;margin-top:2px;}
+.modal{position:fixed;inset:0;z-index:800;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(15px);padding:20px;}
+.modal.on{display:flex;}
+.modal-box{background:rgba(10,8,20,0.98);border:1px solid rgba(180,79,255,0.25);border-radius:28px;padding:32px;width:100%;max-width:400px;animation:modalPop .4s cubic-bezier(.16,1,.3,1);box-shadow:0 40px 80px rgba(0,0,0,0.7);}
+@keyframes modalPop{from{opacity:0;transform:scale(0.88) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,var(--p1),var(--p4));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s;-webkit-text-fill-color:var(--muted);}
+.modal-close:hover{background:rgba(180,79,255,0.1);-webkit-text-fill-color:var(--p1);}
+.form-row{margin-bottom:14px;}
+.form-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px;}
+.form-inp{width:100%;background:rgba(180,79,255,0.06);border:1px solid var(--border);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:all .3s;}
+.form-inp:focus{border-color:var(--p1);box-shadow:0 0 0 3px rgba(180,79,255,0.12);}
+.btn-save{width:100%;padding:13px;border:none;border-radius:13px;cursor:pointer;background:linear-gradient(135deg,var(--p2),var(--p1));color:#fff;font-weight:700;font-size:14px;transition:all .3s;}
+.btn-save:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(180,79,255,0.4);}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);background:rgba(10,8,20,0.97);backdrop-filter:blur(25px);border:1px solid rgba(180,79,255,0.3);border-radius:16px;padding:13px 24px;font-size:13px;font-weight:500;z-index:9999;transition:transform .45s cubic-bezier(.16,1,.3,1);white-space:nowrap;box-shadow:0 10px 40px rgba(0,0,0,0.5);}
+.toast.on{transform:translateX(-50%) translateY(0);}
+.ripple{position:absolute;border-radius:50%;background:rgba(180,79,255,0.35);transform:scale(0);animation:rippleOut .6s linear;pointer-events:none;}
+@keyframes rippleOut{to{transform:scale(4);opacity:0;}}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="aurora"><div class="aurora-blob ab1"></div><div class="aurora-blob ab2"></div><div class="aurora-blob ab3"></div><div class="aurora-blob ab4"></div></div>
+<div id="stars"></div>
+<div id="particles"></div>
+<div id="loginPage">
+  <div class="login-box">
+    <div class="wicons"><span>☀️</span><span>🌧️</span><span>❄️</span><span>🌬️</span></div>
+    <div class="brand">StyleWeather</div>
+    <div class="brand-sub">Dress smart. Eat right. Stay healthy.</div>
+    <label class="lbl">Email</label>
+    <input class="inp" id="lgEmail" type="email" value="demo@style.com">
+    <label class="lbl">Password</label>
+    <input class="inp" id="lgPass" type="password" value="password">
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="divider">or</div>
+    <button class="btn-outline" onclick="doLogin()">Continue as Guest</button>
+  </div>
+</div>
+<div id="app">
+  <div class="overlay" id="overlay" onclick="closeSB()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sb-head"><div class="sb-logo">StyleWeather</div><button class="sb-close" onclick="closeSB()">✕</button></div>
+    <div class="sb-profile"><div class="avatar" id="avLetter">D</div><div><div style="font-size:14px;font-weight:600;" id="sbName">Demo</div><div style="font-size:12px;color:var(--muted);" id="sbEmail">demo@style.com</div></div></div>
+    <div class="sb-nav">
+      <div class="ni" onclick="goHome();closeSB()"><span class="ic">🏠</span>Home</div>
+      <div class="ni" onclick="openModal();closeSB()"><span class="ic">👤</span>Edit Profile</div>
+      <div class="ni" onclick="goCollections();closeSB()"><span class="ic">👗</span>My Collections<span class="bdg" id="totalBadge">0</span></div>
+      <div class="ni" onclick="goDressGuide();closeSB()"><span class="ic">⚠️</span>Dress Health Guide</div>
+    </div>
+    <div class="sb-foot"><div class="ni ni-red" onclick="doLogout()"><span class="ic">🚪</span>Logout</div></div>
+  </div>
+  <div class="topbar">
+    <button class="hbg" onclick="openSB()"><span></span><span></span><span></span></button>
+    <div class="tb-logo">StyleWeather</div>
+    <div class="tb-wx"><span id="tbIco">☀️</span>&nbsp;<span id="tbTemp">33°C</span></div>
+  </div>
+  <div id="homePage">
+    <div class="main page-enter">
+      <div class="loc-row"><input class="loc-inp" id="cityInp" placeholder="🗺️ Enter city..." value="Chennai"><button class="btn-wx" id="btnWx" onclick="getWeather()">Get Weather 🌍</button></div>
+      <div class="wx-card">
+        <div class="wx-top"><div><div class="wx-temp"><span id="wxTemp">33</span><sup>°C</sup></div><div class="wx-desc" id="wxDesc">Hot &amp; Sunny</div><div class="wx-loc">📍 <span id="wxLoc">Chennai</span></div></div><div class="wx-ico" id="wxIco">☀️</div></div>
+        <div class="wx-dets"><div class="wx-det">💧 Humidity<span id="wxH"> 80%</span></div><div class="wx-det">💨 Wind<span id="wxW"> 14km/h</span></div><div class="wx-det">🌡️<span id="wxF"> Feels 38°C</span></div></div>
+      </div>
+      <div class="sec" id="outfitTitle">☀️ Today's Outfit</div>
+      <div class="outfit-grid">
+        <div class="oc" id="oc_shirt"><div class="oc-imgwrap" id="ocimg_shirt"><span class="oc-emoji">👕</span></div><div class="oc-body"><div class="oc-type">SHIRT</div><div class="oc-name" id="ocname_shirt">Cotton Tee</div><div class="oc-tip" id="octip_shirt">Breathable</div><div class="oc-badge" id="ocbadge_shirt">Upload photo</div></div></div>
+        <div class="oc" id="oc_pant"><div class="oc-imgwrap" id="ocimg_pant"><span class="oc-emoji">👖</span></div><div class="oc-body"><div class="oc-type">PANT</div><div class="oc-name" id="ocname_pant">Linen Trouser</div><div class="oc-tip" id="octip_pant">Light fabric</div><div class="oc-badge" id="ocbadge_pant">Upload photo</div></div></div>
+        <div class="oc" id="oc_shoe"><div class="oc-imgwrap" id="ocimg_shoe"><span class="oc-emoji">👟</span></div><div class="oc-body"><div class="oc-type">SHOES</div><div class="oc-name" id="ocname_shoe">Mesh Sneakers</div><div class="oc-tip" id="octip_shoe">Airflow</div><div class="oc-badge" id="ocbadge_shoe">Upload photo</div></div></div>
+        <div class="oc" id="oc_glass"><div class="oc-imgwrap" id="ocimg_glass"><span class="oc-emoji">🕶️</span></div><div class="oc-body"><div class="oc-type">SUNGLASSES</div><div class="oc-name" id="ocname_glass">Polarized</div><div class="oc-tip" id="octip_glass">UV protect</div><div class="oc-badge" id="ocbadge_glass">Upload photo</div></div></div>
+      </div>
+      <div class="sec">🩺 Body Health Warnings Today</div>
+      <div id="healthSection" style="margin-bottom:28px;"></div>
+      <div class="sec">🍽️ Recommended Foods</div>
+      <div class="food-grid" id="foodGrid"></div>
+      <div class="sec">👗 My Wardrobe</div>
+      <div class="fabric-suggest">
+        🧵 Shirt &amp; Pant → <strong id="fabricSuggestText">Cotton, Linen</strong> best today &nbsp;|&nbsp; 👟 Shoe &amp; Glass → tag by weather
+        <div class="fab-chips" id="fabricChips"></div>
+      </div>
+      <div class="wardrobe-grid">
+        <div class="wcat"><div class="wcat-head"><span class="wcat-emoji">👕</span><span class="wcat-title">Shirts</span><span class="wcat-count" id="cnt_shirt">0 items</span></div><div class="drop" onclick="document.getElementById('fi_shirt').click()"><input type="file" id="fi_shirt" accept="image/*" multiple onchange="upload(this,'shirt')"><div class="drop-ico">+</div><div class="drop-txt">Upload shirt photos</div></div><div class="photo-list" id="list_shirt"></div></div>
+        <div class="wcat"><div class="wcat-head"><span class="wcat-emoji">👖</span><span class="wcat-title">Pants</span><span class="wcat-count" id="cnt_pant">0 items</span></div><div class="drop" onclick="document.getElementById('fi_pant').click()"><input type="file" id="fi_pant" accept="image/*" multiple onchange="upload(this,'pant')"><div class="drop-ico">+</div><div class="drop-txt">Upload pant photos</div></div><div class="photo-list" id="list_pant"></div></div>
+        <div class="wcat"><div class="wcat-head"><span class="wcat-emoji">👟</span><span class="wcat-title">Shoes</span><span class="wcat-count" id="cnt_shoe">0 items</span></div><div class="drop" onclick="document.getElementById('fi_shoe').click()"><input type="file" id="fi_shoe" accept="image/*" multiple onchange="upload(this,'shoe')"><div class="drop-ico">+</div><div class="drop-txt">Upload shoe photos</div></div><div class="photo-list" id="list_shoe"></div></div>
+        <div class="wcat"><div class="wcat-head"><span class="wcat-emoji">🕶️</span><span class="wcat-title">Sunglasses</span><span class="wcat-count" id="cnt_glass">0 items</span></div><div class="drop" onclick="document.getElementById('fi_glass').click()"><input type="file" id="fi_glass" accept="image/*" multiple onchange="upload(this,'glass')"><div class="drop-ico">+</div><div class="drop-txt">Upload glasses photos</div></div><div class="photo-list" id="list_glass"></div></div>
+      </div>
+    </div>
+  </div>
+  <div id="collectionsPage"><div class="main page-enter"><div class="sec">👗 My Collections</div><div class="ctabs"><button class="ctab on" onclick="filterCol('all',this)">All</button><button class="ctab" onclick="filterCol('shirt',this)">Shirts</button><button class="ctab" onclick="filterCol('pant',this)">Pants</button><button class="ctab" onclick="filterCol('shoe',this)">Shoes</button><button class="ctab" onclick="filterCol('glass',this)">Glasses</button></div><div class="col-grid" id="colGrid"></div><div id="colEmpty" style="text-align:center;padding:60px 20px;color:var(--muted);"><div style="font-size:52px;animation:emojiPulse 3s ease-in-out infinite">👗</div><div style="margin-top:12px;font-size:14px;">Upload clothes to see your collection</div></div></div></div>
+  <div id="dressGuidePage" style="display:none;"><div class="main page-enter"><div class="sec">⚠️ Dress Health Guide</div><p style="font-size:13px;color:var(--muted);margin-bottom:22px;">What body problems happen when you wear each clothing type in different weather.</p><div id="dressGuideList"></div></div></div>
+</div>
+<div class="modal" id="profileModal"><div class="modal-box"><div class="modal-title">Edit Profile <button class="modal-close" onclick="closeModal()">✕</button></div><div class="form-row"><label class="form-lbl">Name</label><input class="form-inp" id="pName"></div><div class="form-row"><label class="form-lbl">Email</label><input class="form-inp" id="pEmail" type="email"></div><div class="form-row"><label class="form-lbl">City</label><input class="form-inp" id="pCity"></div><button class="btn-save" onclick="saveProfile()">Save ✓</button></div></div>
+<div class="toast" id="toastEl"></div>
+<script>
+(function(){var c=document.getElementById('stars');for(var i=0;i<120;i++){var s=document.createElement('div');s.className='star';var sz=Math.random()*2+0.5;s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-duration:'+(Math.random()*4+2)+'s;animation-delay:'+(Math.random()*5)+'s;';c.appendChild(s);}})();
+(function(){var c=document.getElementById('particles');var colors=['rgba(180,79,255,0.5)','rgba(124,58,237,0.4)','rgba(6,214,255,0.3)','rgba(224,64,251,0.3)','rgba(255,255,255,0.2)'];for(var i=0;i<35;i++){var p=document.createElement('div');p.className='particle';var sz=Math.random()*4+1.5;p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;background:'+colors[Math.floor(Math.random()*colors.length)]+';animation-duration:'+(Math.random()*18+8)+'s;animation-delay:'+(Math.random()*12)+'s;';c.appendChild(p);}})();
+document.addEventListener('click',function(e){var btn=e.target.closest('.btn-primary,.btn-wx,.btn-save,.ctab,.btn-outline');if(!btn)return;var r=document.createElement('span');r.className='ripple';var rect=btn.getBoundingClientRect();var sz=Math.max(rect.width,rect.height);r.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(e.clientX-rect.left-sz/2)+'px;top:'+(e.clientY-rect.top-sz/2)+'px;position:absolute;';btn.style.position='relative';btn.style.overflow='hidden';btn.appendChild(r);setTimeout(function(){r.remove();},600);});
+
+var WX={chennai:{t:33,d:'Hot & Sunny',i:'☀️',h:'80%',w:'14km/h',f:'38°C'},mumbai:{t:30,d:'Humid & Cloudy',i:'⛅',h:'85%',w:'20km/h',f:'35°C'},delhi:{t:28,d:'Partly Cloudy',i:'🌤️',h:'55%',w:'16km/h',f:'30°C'},bangalore:{t:24,d:'Pleasant',i:'🌥️',h:'65%',w:'12km/h',f:'24°C'},kolkata:{t:31,d:'Warm & Humid',i:'☁️',h:'78%',w:'10km/h',f:'36°C'},hyderabad:{t:29,d:'Mostly Sunny',i:'🌞',h:'60%',w:'15km/h',f:'32°C'},pune:{t:27,d:'Comfortable',i:'🌤️',h:'58%',w:'11km/h',f:'27°C'},ahmedabad:{t:36,d:'Very Hot',i:'🔆',h:'40%',w:'18km/h',f:'41°C'},london:{t:12,d:'Rainy',i:'🌧️',h:'90%',w:'25km/h',f:'8°C'},paris:{t:16,d:'Mild & Cloudy',i:'🌦️',h:'72%',w:'18km/h',f:'13°C'},tokyo:{t:20,d:'Clear',i:'🌸',h:'55%',w:'12km/h',f:'20°C'},dubai:{t:40,d:'Extreme Heat',i:'🔥',h:'30%',w:'20km/h',f:'45°C'},singapore:{t:32,d:'Tropical',i:'🌴',h:'88%',w:'12km/h',f:'38°C'},'new york':{t:15,d:'Windy',i:'💨',h:'60%',w:'35km/h',f:'10°C'}};
+var FABRICS=[{id:'cotton',label:'🌿 Cotton',cls:'f-cotton',color:'#e07b39',tip:'Breathable — best for hot'},{id:'linen',label:'🍃 Linen',cls:'f-linen',color:'#d4b020',tip:'Ultra-light — humid heat'},{id:'polyester',label:'⚡ Polyester',cls:'f-polyester',color:'#4090d0',tip:'Quick-dry — warm to cool'},{id:'lycra',label:'🤸 Lycra',cls:'f-lycra',color:'#9060d0',tip:'Stretchy — gym & active'},{id:'denim',label:'🔵 Denim',cls:'f-denim',color:'#406090',tip:'Sturdy — cool to mild'},{id:'wool',label:'🐑 Wool',cls:'f-wool',color:'#5070ff',tip:'Insulator — cold essential'},{id:'fleece',label:'🧥 Fleece',cls:'f-fleece',color:'#3080c0',tip:'Warmth — cool/cold days'},{id:'silk',label:'✨ Silk',cls:'f-silk',color:'#c060a0',tip:'Light — pleasant weather'},{id:'nylon',label:'💪 Nylon',cls:'f-nylon',color:'#40a080',tip:'Lightweight — all-season'}];
+var FABRIC_BY_TEMP={extreme:['cotton','linen'],hot:['cotton','linen','nylon'],warm:['cotton','polyester','silk'],pleasant:['polyester','silk','denim','nylon'],cool:['denim','fleece','wool','lycra'],cold:['wool','fleece','lycra']};
+var WEATHER_TAGS=[{id:'extreme',label:'🔥 Extreme',color:'#ff4422'},{id:'hot',label:'☀️ Hot',color:'#f0a020'},{id:'warm',label:'🌤️ Warm',color:'#d4b020'},{id:'pleasant',label:'⛅ Pleasant',color:'#b44fff'},{id:'cool',label:'🌬️ Cool',color:'#06d6ff'},{id:'cold',label:'❄️ Cold',color:'#7c3aed'},{id:'any',label:'✓ All',color:'#40c080'}];
+var FOOD={extreme:[{e:'🥥',n:'Tender Coconut',d:'Instant body coolant'},{e:'🍧',n:'Ice Cream',d:'Beat the heat!'},{e:'🥒',n:'Cucumber Juice',d:'Maximum hydration'},{e:'🍉',n:'Watermelon',d:'90% water — perfect'},{e:'🥗',n:'Light Salad',d:'Avoid heavy meals'},{e:'🧊',n:'Buttermilk',d:'Cools the stomach'}],hot:[{e:'🥥',n:'Tender Coconut',d:'Natural coolant'},{e:'🍋',n:'Lemon Rice',d:'Tangy and refreshing'},{e:'🍚',n:'Curd Rice',d:'Classic cooling comfort'},{e:'🥭',n:'Mango Lassi',d:'Summer special'},{e:'🥗',n:'Fruit Salad',d:'Light and nutritious'},{e:'🫖',n:'Iced Tea',d:'Refreshing drink'}],warm:[{e:'🍛',n:'Sambar Rice',d:'Wholesome comfort'},{e:'🫓',n:'Chapati',d:'Light and filling'},{e:'🥤',n:'Fresh Juice',d:'Vitamins boost'},{e:'🍜',n:'Noodles',d:'Quick energy'},{e:'🥙',n:'Sandwich',d:'Great on-the-go'},{e:'🍵',n:'Green Tea',d:'Antioxidants rich'}],pleasant:[{e:'🍕',n:'Pizza',d:'Perfect weather!'},{e:'🍜',n:'Biryani',d:'Hearty & satisfying'},{e:'☕',n:'Coffee',d:'Cozy vibes'},{e:'🥘',n:'Fried Rice',d:'Quick and tasty'},{e:'🧆',n:'Pakoda',d:'Evening special'},{e:'🍫',n:'Chocolate',d:'Mood booster'}],cool:[{e:'🍲',n:'Hot Soup',d:'Warms you up'},{e:'☕',n:'Hot Chai',d:'A must-have!'},{e:'🫕',n:'Spicy Curry',d:'Warms the body'},{e:'🍞',n:'Toast & Butter',d:'Comfort breakfast'},{e:'🥘',n:'Dal & Rice',d:'Warm and filling'},{e:'🫚',n:'Fried Snacks',d:'Pakoda time!'}],cold:[{e:'🍲',n:'Hot Soup',d:'Essential in cold'},{e:'☕',n:'Hot Cocoa',d:'Keep hands warm'},{e:'🥘',n:'Spicy Curry',d:'Spice = warmth'},{e:'🍜',n:'Noodle Soup',d:'Soul food for cold'},{e:'🧈',n:'Ghee Rice',d:'Energy & warmth'},{e:'🫚',n:'Deep Fried',d:'Calories = warmth!'}]};
+var HEALTH={extreme:[{icon:'🥵',name:'Heat Stroke',desc:'Body temp rises dangerously.',level:'h'},{icon:'💧',name:'Severe Dehydration',desc:'Drink water every 20 mins.',level:'h'},{icon:'🔴',name:'Sunburn',desc:'Skin burns in minutes. SPF50.',level:'h'},{icon:'❤️',name:'Heart Stress',desc:'Heart works harder. Rest often.',level:'h'},{icon:'😵',name:'Fainting Risk',desc:'Low BP from heat.',level:'m'},{icon:'👁️',name:'Eye Damage',desc:'Always wear UV400 glasses.',level:'m'}],hot:[{icon:'💧',name:'Dehydration',desc:'Drink at least 3L water daily.',level:'h'},{icon:'🔴',name:'Sunburn',desc:'30 min exposure can burn.',level:'h'},{icon:'🥵',name:'Heat Exhaustion',desc:'Sweating, weakness. Rest in shade.',level:'m'},{icon:'🦠',name:'Prickly Heat Rash',desc:'Sweat + tight clothes = rash.',level:'m'},{icon:'😮‍💨',name:'Fatigue',desc:'Heat drains energy fast.',level:'m'},{icon:'🤢',name:'Nausea',desc:'Overeating in heat causes issues.',level:'l'}],warm:[{icon:'💧',name:'Mild Dehydration',desc:'Carry water always.',level:'m'},{icon:'🦠',name:'Sweat Rash',desc:'Humid fabric causes irritation.',level:'l'},{icon:'😴',name:'Afternoon Fatigue',desc:'Warm afternoons feel sleepy.',level:'l'},{icon:'🌿',name:'Allergy Risk',desc:'Warm weather increases pollen.',level:'l'},{icon:'🔴',name:'Mild Sunburn',desc:'Sunscreen still recommended.',level:'l'},{icon:'🩸',name:'BP Fluctuation',desc:'Mild blood pressure changes.',level:'l'}],pleasant:[{icon:'✅',name:'Generally Safe',desc:'Ideal weather. Great to exercise!',level:'l'},{icon:'🌿',name:'Allergy Season',desc:'Pollen can trigger allergies.',level:'l'},{icon:'👁️',name:'Dry Eyes',desc:'Low humidity causes dryness.',level:'l'},{icon:'💧',name:'Stay Hydrated',desc:'Drink enough water.',level:'l'},{icon:'🦵',name:'Stay Active',desc:'Perfect to walk or exercise.',level:'l'},{icon:'😊',name:'Mood Boost',desc:'Pleasant weather boosts mood.',level:'l'}],cool:[{icon:'🤧',name:'Cold & Flu Risk',desc:'Cool air weakens immunity.',level:'h'},{icon:'🦴',name:'Joint Pain',desc:'Cold stiffens joints.',level:'m'},{icon:'🏃',name:'Muscle Stiffness',desc:'Muscles tighten. Warm up first.',level:'m'},{icon:'🌬️',name:'Dry Skin',desc:'Cold reduces skin moisture.',level:'m'},{icon:'👃',name:'Blocked Nose',desc:'Cold air blocks nasal passages.',level:'m'},{icon:'😮‍💨',name:'Breathing Difficulty',desc:'Can trigger mild asthma.',level:'l'}],cold:[{icon:'🤧',name:'Flu & Fever',desc:'Very high viral infection risk.',level:'h'},{icon:'🥶',name:'Hypothermia',desc:'Body temp drops. Layer up!',level:'h'},{icon:'🫀',name:'Heart Attack Risk',desc:'Cold raises BP and heart strain.',level:'h'},{icon:'🦴',name:'Severe Joint Pain',desc:'Arthritis worsens in cold.',level:'h'},{icon:'🌬️',name:'Chapped Skin',desc:'Use thick moisturiser.',level:'m'},{icon:'🫁',name:'Respiratory Issues',desc:'Triggers asthma, bronchitis.',level:'m'}]};
+var DRESS_GUIDE=[{emoji:'👕',name:'T-Shirt',sub:'Casual top for all seasons',rows:[{wx:'🔥 Extreme (40°C+)',tags:[{t:'✅ Ideal',c:'dt-green'}]},{wx:'☀️ Hot (33–39°C)',tags:[{t:'✅ Best choice',c:'dt-green'},{t:'Prickly heat if synthetic',c:'dt-yellow'}]},{wx:'⛅ Pleasant (22–27°C)',tags:[{t:'✅ Comfortable',c:'dt-green'}]},{wx:'🌬️ Cool (15–21°C)',tags:[{t:'Body chills',c:'dt-red'},{t:'Flu risk',c:'dt-red'}]},{wx:'❄️ Cold',tags:[{t:'🚨 Hypothermia risk',c:'dt-red'}]}]},{emoji:'👔',name:'Formal Shirt',sub:'Office & formal wear',rows:[{wx:'🔥 Extreme',tags:[{t:'Heavy sweating',c:'dt-red'},{t:'Heat exhaustion',c:'dt-red'}]},{wx:'🌤️ Warm (28–32°C)',tags:[{t:'✅ Good in light fabric',c:'dt-green'}]},{wx:'⛅ Pleasant',tags:[{t:'✅ Perfect for office',c:'dt-green'}]},{wx:'❄️ Cold',tags:[{t:'Too thin alone',c:'dt-red'},{t:'Layer under jacket',c:'dt-yellow'}]}]},{emoji:'🧥',name:'Jacket / Hoodie',sub:'Outerwear for cold days',rows:[{wx:'🔥 Extreme',tags:[{t:'🚨 Heat stroke risk',c:'dt-red'}]},{wx:'⛅ Pleasant',tags:[{t:'✅ Fine for evenings',c:'dt-green'}]},{wx:'🌬️ Cool',tags:[{t:'✅ Perfect warmth',c:'dt-green'}]},{wx:'❄️ Cold',tags:[{t:'✅ Essential',c:'dt-green'}]}]},{emoji:'👖',name:'Jeans / Denim',sub:'Heavy cotton trousers',rows:[{wx:'🔥 Extreme',tags:[{t:'🚨 Severe sweating',c:'dt-red'},{t:'Skin rash',c:'dt-red'}]},{wx:'⛅ Pleasant',tags:[{t:'✅ Ideal choice',c:'dt-green'}]},{wx:'🌬️ Cool',tags:[{t:'✅ Good warmth',c:'dt-green'}]},{wx:'❄️ Cold',tags:[{t:'✅ Thick denim works',c:'dt-green'},{t:'Add thermal innerwear',c:'dt-yellow'}]}]},{emoji:'🩳',name:'Shorts',sub:'Hot weather only',rows:[{wx:'🔥 Extreme',tags:[{t:'✅ Best option',c:'dt-green'}]},{wx:'☀️ Hot',tags:[{t:'✅ Great comfort',c:'dt-green'}]},{wx:'🌬️ Cool',tags:[{t:'Legs feel very cold',c:'dt-red'}]},{wx:'❄️ Cold',tags:[{t:'🚨 Never wear outside',c:'dt-red'}]}]}];
+
+var wardrobe={shirt:[],pant:[],shoe:[],glass:[]};
+var curTemp=33;
+var user={name:'Demo',email:'demo@style.com',city:'Chennai'};
+
+function getKey(t){if(t>=40)return'extreme';if(t>=33)return'hot';if(t>=28)return'warm';if(t>=22)return'pleasant';if(t>=15)return'cool';return'cold';}
+function getBestFabrics(t){return FABRIC_BY_TEMP[getKey(t)]||['cotton'];}
+
+function renderFabricBanner(){
+  var bestIds=FABRIC_BY_TEMP[getKey(curTemp)];
+  var fabObjs=bestIds.map(function(id){return FABRICS.find(function(f){return f.id===id;});}).filter(Boolean);
+  document.getElementById('fabricSuggestText').textContent=fabObjs.map(function(f){return f.label;}).join(', ');
+  var chips=document.getElementById('fabricChips');chips.innerHTML='';
+  fabObjs.forEach(function(f,i){var s=document.createElement('span');s.className='fab-chip';s.style.cssText='background:'+f.color+'20;color:'+f.color+';border-color:'+f.color+'50;animation-delay:'+(i*0.08)+'s;';s.textContent=f.label+' — '+f.tip;chips.appendChild(s);});
+}
+
+function getOutfit(t){if(t>=40)return{label:'🔥 Extreme Heat Outfit',color:'#ff4422',shirt:{e:'🩱',n:'Sleeveless Tee',tip:'Sleeveless is best'},pant:{e:'🩳',n:'Shorts',tip:'Light & short only'},shoe:{e:'🩴',n:'Sandals',tip:'Open footwear only'},glass:{e:'🕶️',n:'UV400 Sunglasses',tip:'Eyes need protection'}};if(t>=33)return{label:'☀️ Hot Weather Outfit',color:'#f0a020',shirt:{e:'👕',n:'Light Cotton Tee',tip:'Breathable fabric only'},pant:{e:'👖',n:'Linen Trousers',tip:'Light fabric stays cool'},shoe:{e:'👟',n:'Mesh Sneakers',tip:'Mesh allows airflow'},glass:{e:'🕶️',n:'Polarized Shades',tip:'Strong sun protection'}};if(t>=28)return{label:'🌤️ Warm Day Outfit',color:'#d4b020',shirt:{e:'👔',n:'Casual Shirt',tip:'Light colours reflect heat'},pant:{e:'👖',n:'Chino Pants',tip:'Comfortable choice'},shoe:{e:'👞',n:'Loafers',tip:'Easy slip-on'},glass:{e:'🕶️',n:'Tinted Glasses',tip:'Moderate UV protection'}};if(t>=22)return{label:'⛅ Pleasant Outfit',color:'#b44fff',shirt:{e:'👔',n:'Full Sleeve Shirt',tip:'Light layer is enough'},pant:{e:'👖',n:'Regular Jeans',tip:'Perfect for this weather'},shoe:{e:'👟',n:'Casual Sneakers',tip:'Closed shoes recommended'},glass:{e:'🕶️',n:'Light Sunglasses',tip:'Sun is mild — optional'}};if(t>=15)return{label:'🌬️ Cool Weather Outfit',color:'#06d6ff',shirt:{e:'🧥',n:'Light Jacket',tip:'Layer up!'},pant:{e:'👖',n:'Thick Jeans',tip:'Denim for warmth'},shoe:{e:'👟',n:'Closed Sneakers',tip:'No sandals today'},glass:{e:'👓',n:'Clear Glasses',tip:'Shades optional'}};return{label:'❄️ Cold Weather Outfit',color:'#7c3aed',shirt:{e:'🧥',n:'Warm Jacket/Hoodie',tip:'Thick layer essential'},pant:{e:'👖',n:'Thick Trousers',tip:'Insulated pants needed'},shoe:{e:'🥾',n:'Boots',tip:'Boots keep feet warm'},glass:{e:'🥽',n:'Wrap Glasses',tip:'Protect from cold wind'}};}
+
+function renderHealth(){var key=getKey(curTemp);var items=HEALTH[key];var cols={extreme:'#ff4422',hot:'#f0a020',warm:'#d4b020',pleasant:'#b44fff',cool:'#06d6ff',cold:'#7c3aed'};var col=cols[key];var titles={extreme:'🚨 Extreme Heat — Stay Indoors!',hot:'☀️ Hot Weather — Take Precautions',warm:'🌤️ Warm Weather — Stay Aware',pleasant:'⛅ Pleasant — Great Day to Be Out!',cool:'🌬️ Cool Weather — Dress Warm',cold:'❄️ Cold Weather — High Risk!'};var html='<div class="health-box"><div class="health-head" style="background:'+col+'12;border-bottom:1px solid '+col+'33"><div style="font-size:34px">🩺</div><div><div style="font-size:14px;font-weight:700;color:'+col+'">'+titles[key]+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+curTemp+'°C today</div></div></div><div class="health-grid">';items.forEach(function(item,i){var lc=item.level==='h'?'lh':item.level==='m'?'lm':'ll';var lt=item.level==='h'?'⚠️ High Risk':item.level==='m'?'⚡ Moderate':'✓ Low Risk';html+='<div class="hi" style="animation-delay:'+(i*0.07)+'s"><div class="hi-icon">'+item.icon+'</div><div class="hi-name">'+item.name+'</div><div class="hi-desc">'+item.desc+'</div><span class="hi-lvl '+lc+'">'+lt+'</span></div>';});html+='</div></div>';document.getElementById('healthSection').innerHTML=html;}
+
+function renderFood(){var key=getKey(curTemp);var foods=FOOD[key];var cols={extreme:'#ff4422',hot:'#f0a020',warm:'#d4b020',pleasant:'#b44fff',cool:'#06d6ff',cold:'#7c3aed'};var col=cols[key];var grid=document.getElementById('foodGrid');grid.innerHTML='';foods.forEach(function(f,i){var d=document.createElement('div');d.className='food-card';d.style.cssText='border-color:'+col+'44;animation-delay:'+(i*0.07)+'s;';d.innerHTML='<span class="food-emoji">'+f.e+'</span><div class="food-name">'+f.n+'</div><div class="food-desc">'+f.d+'</div><span class="food-badge" style="background:'+col+'18;color:'+col+';border-color:'+col+'44">'+curTemp+'°C</span>';grid.appendChild(d);});}
+
+function renderDressGuide(){var html='';DRESS_GUIDE.forEach(function(dress,di){html+='<div class="dg-card"><div class="dg-head" onclick="toggleDress('+di+')"><span class="dg-emoji">'+dress.emoji+'</span><div class="dg-info"><div class="dg-name">'+dress.name+'</div><div class="dg-sub">'+dress.sub+'</div></div><span class="dg-arrow" id="dga'+di+'">▼</span></div><div class="dg-body" id="dgb'+di+'">';dress.rows.forEach(function(row){html+='<div class="dg-row"><div class="dg-wx">'+row.wx+'</div><div class="dg-tags">';row.tags.forEach(function(tag){html+='<span class="dt '+tag.c+'">'+tag.t+'</span>';});html+='</div></div>';});html+='</div></div>';});document.getElementById('dressGuideList').innerHTML=html;}
+function toggleDress(di){var b=document.getElementById('dgb'+di),a=document.getElementById('dga'+di);var open=b.classList.contains('open');b.classList.toggle('open',!open);a.classList.toggle('open',!open);}
+
+function pickPhoto(cat){
+  var items=wardrobe[cat];if(!items.length)return null;
+  var isFabric=(cat==='shirt'||cat==='pant');
+  if(isFabric){
+    var best=getBestFabrics(curTemp);
+    for(var i=0;i<items.length;i++){if(items[i].tag&&best.indexOf(items[i].tag)>=0)return items[i];}
+  } else {
+    var curKey=getKey(curTemp);
+    for(var i=0;i<items.length;i++){if(items[i].tag===curKey)return items[i];}
+    for(var i=0;i<items.length;i++){if(items[i].tag==='any')return items[i];}
+  }
+  for(var j=0;j<items.length;j++){if(!items[j].tag)return items[j];}
+  return items[0];
+}
+
+function renderCards(){
+  var o=getOutfit(curTemp);
+  document.getElementById('outfitTitle').textContent=o.label;
+  ['shirt','pant','shoe','glass'].forEach(function(cat){
+    var d=o[cat],card=document.getElementById('oc_'+cat),wrap=document.getElementById('ocimg_'+cat),photo=pickPhoto(cat);
+    card.style.borderColor=o.color+'99';
+    card.style.background='linear-gradient(160deg,var(--card),'+o.color+'15)';
+    card.style.boxShadow='0 8px 30px '+o.color+'18';
+    document.getElementById('ocname_'+cat).textContent=d.n;
+    document.getElementById('octip_'+cat).textContent=d.tip;
+    if(photo){
+      wrap.innerHTML='<img src="'+photo.src+'">';
+      var isFabric=(cat==='shirt'||cat==='pant');
+      var badgeTxt='✓ Your outfit';
+      if(isFabric&&photo.tag){var fo=FABRICS.find(function(f){return f.id===photo.tag;});if(fo)badgeTxt=fo.label;}
+      else if(!isFabric&&photo.tag){var wt=WEATHER_TAGS.find(function(w){return w.id===photo.tag;});if(wt)badgeTxt=wt.label;}
+      document.getElementById('ocbadge_'+cat).textContent=badgeTxt;
+    } else {
+      wrap.innerHTML='<span class="oc-emoji">'+d.e+'</span>';
+      document.getElementById('ocbadge_'+cat).textContent='Upload photo';
+    }
+  });
+}
+
+function refreshAll(){renderCards();renderHealth();renderFood();renderFabricBanner();}
+
+function upload(input,cat){
+  Array.from(input.files).forEach(function(file){
+    var r=new FileReader();
+    r.onload=function(e){
+      wardrobe[cat].push({src:e.target.result,name:file.name,tag:null});
+      renderPhotoList(cat);updateCounts();refreshAll();
+      var msg=(cat==='shirt'||cat==='pant')?'📸 Uploaded! Set fabric type 👇':'📸 Uploaded! Set weather tag 👇';
+      showToast(msg);
+    };
+    r.readAsDataURL(file);
+  });
+  input.value='';
+}
+
+function renderPhotoList(cat){
+  var list=document.getElementById('list_'+cat);
+  list.innerHTML='';
+  var isFabric=(cat==='shirt'||cat==='pant');
+  wardrobe[cat].forEach(function(item,idx){
+    var div=document.createElement('div');
+    div.className='photo-item';
+    var tb='';var badge='';
+    if(isFabric){
+      tb=FABRICS.map(function(fab){
+        var sel=item.tag===fab.id;
+        return'<button class="tag-btn '+fab.cls+(sel?' sel':'')+'" onclick="setTag(\''+cat+'\','+idx+',\''+fab.id+'\')" title="'+fab.tip+'">'+fab.label+'</button>';
+      }).join('');
+      var best=getBestFabrics(curTemp);
+      var isBest=item.tag&&best.indexOf(item.tag)>=0;
+      badge=item.tag?(isBest?'<span style="font-size:10px;color:#06d6ff;font-weight:700;margin-left:4px">✓ Best today!</span>':'<span style="font-size:10px;color:var(--muted);font-weight:600;margin-left:4px">Not ideal</span>'):'';
+    } else {
+      tb=WEATHER_TAGS.map(function(wt){
+        var sel=item.tag===wt.id;
+        return'<button class="tag-btn" style="border-color:'+(sel?wt.color:'rgba(180,79,255,0.2)')+';background:'+(sel?wt.color:'transparent')+';color:'+(sel?'#fff':'var(--muted)')+';box-shadow:'+(sel?'0 3px 10px '+wt.color+'55':'none')+';" onclick="setTag(\''+cat+'\','+idx+',\''+wt.id+'\')">'+wt.label+'</button>';
+      }).join('');
+      var curKey=getKey(curTemp);
+      var isMatch=item.tag===curKey||item.tag==='any';
+      badge=item.tag?(isMatch?'<span style="font-size:10px;color:#06d6ff;font-weight:700;margin-left:4px">✓ Match today!</span>':'<span style="font-size:10px;color:var(--muted);font-weight:600;margin-left:4px">Not for today</span>'):'';
+    }
+    div.innerHTML='<img src="'+item.src+'"><div class="photo-item-info"><div class="photo-item-name">'+item.name+badge+'</div><div class="tag-row">'+tb+'</div></div><button class="photo-del" onclick="delPhoto(\''+cat+'\','+idx+')">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+function setTag(cat,idx,tagId){
+  wardrobe[cat][idx].tag=tagId;
+  renderPhotoList(cat);refreshAll();
+  var isFabric=(cat==='shirt'||cat==='pant');
+  if(isFabric){var fab=FABRICS.find(function(f){return f.id===tagId;});showToast((fab?fab.label:'Fabric')+' set! ✓');}
+  else{var wt=WEATHER_TAGS.find(function(w){return w.id===tagId;});showToast((wt?wt.label:'Weather')+' tag set! ✓');}
+}
+function delPhoto(cat,idx){wardrobe[cat].splice(idx,1);renderPhotoList(cat);updateCounts();refreshAll();}
+function updateCounts(){var total=0;['shirt','pant','shoe','glass'].forEach(function(cat){var c=wardrobe[cat].length;document.getElementById('cnt_'+cat).textContent=c+' item'+(c!==1?'s':'');total+=c;});document.getElementById('totalBadge').textContent=total;}
+
+function getWeather(){var city=document.getElementById('cityInp').value.trim();if(!city){showToast('Please enter a city!');return;}var btn=document.getElementById('btnWx');btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;setTimeout(function(){var k=city.toLowerCase(),data=WX[k]||{t:Math.round(20+Math.random()*15),d:'Moderate',i:'🌤️',h:'65%',w:'15km/h',f:'25°C'};curTemp=data.t;document.getElementById('wxTemp').textContent=data.t;document.getElementById('wxDesc').textContent=data.d;document.getElementById('wxIco').textContent=data.i;document.getElementById('wxLoc').textContent=city.charAt(0).toUpperCase()+city.slice(1);document.getElementById('wxH').textContent=' '+data.h;document.getElementById('wxW').textContent=' '+data.w;document.getElementById('wxF').textContent=' Feels '+data.f;document.getElementById('tbIco').textContent=data.i;document.getElementById('tbTemp').textContent=data.t+'°C';refreshAll();btn.innerHTML='Get Weather 🌍';btn.disabled=false;showToast('📍 '+city+' — '+data.t+'°C '+data.i);},700);}
+
+function doLogin(){var email=document.getElementById('lgEmail').value||'demo@style.com';var name=email.split('@')[0].replace(/[^a-zA-Z]/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});user.name=name;user.email=email;var lp=document.getElementById('loginPage');lp.style.transition='opacity .6s,transform .6s';lp.style.opacity='0';lp.style.transform='scale(1.06)';setTimeout(function(){lp.style.display='none';document.getElementById('app').style.display='block';document.getElementById('sbName').textContent=user.name;document.getElementById('sbEmail').textContent=user.email;document.getElementById('avLetter').textContent=user.name.charAt(0).toUpperCase();refreshAll();renderDressGuide();showToast('✨ Welcome, '+user.name+'!');},600);}
+function doLogout(){var app=document.getElementById('app');app.style.transition='opacity .4s';app.style.opacity='0';setTimeout(function(){app.style.display='none';app.style.opacity='1';var lp=document.getElementById('loginPage');lp.style.display='flex';lp.style.opacity='0';lp.style.transform='scale(0.96)';lp.style.transition='opacity .5s,transform .5s';setTimeout(function(){lp.style.opacity='1';lp.style.transform='scale(1)';},50);},400);}
+function openSB(){document.getElementById('sidebar').classList.add('on');document.getElementById('overlay').classList.add('on');}
+function closeSB(){document.getElementById('sidebar').classList.remove('on');document.getElementById('overlay').classList.remove('on');}
+function showPage(id){['homePage','collectionsPage','dressGuidePage'].forEach(function(p){document.getElementById(p).style.display='none';});var pg=document.getElementById(id);pg.style.display='block';var m=pg.querySelector('.main');if(m){m.classList.remove('page-enter');void m.offsetWidth;m.classList.add('page-enter');}}
+function goHome(){showPage('homePage');}
+function goCollections(){showPage('collectionsPage');renderCollections('all');}
+function goDressGuide(){showPage('dressGuidePage');}
+function openModal(){document.getElementById('pName').value=user.name;document.getElementById('pEmail').value=user.email;document.getElementById('pCity').value=user.city;document.getElementById('profileModal').classList.add('on');}
+function closeModal(){document.getElementById('profileModal').classList.remove('on');}
+function saveProfile(){user.name=document.getElementById('pName').value||user.name;user.email=document.getElementById('pEmail').value||user.email;user.city=document.getElementById('pCity').value||user.city;document.getElementById('sbName').textContent=user.name;document.getElementById('sbEmail').textContent=user.email;document.getElementById('avLetter').textContent=user.name.charAt(0).toUpperCase();closeModal();showToast('Profile saved ✓');}
+function renderCollections(filter){var grid=document.getElementById('colGrid'),empty=document.getElementById('colEmpty');grid.innerHTML='';var items=[];if(filter==='all'){['shirt','pant','shoe','glass'].forEach(function(cat){wardrobe[cat].forEach(function(item){items.push({cat:cat,src:item.src,name:item.name,tag:item.tag});});});}else{wardrobe[filter].forEach(function(item){items.push({cat:filter,src:item.src,name:item.name,tag:item.tag});});}if(!items.length){empty.style.display='block';grid.style.display='none';return;}empty.style.display='none';grid.style.display='grid';items.forEach(function(item,i){var isFabric=(item.cat==='shirt'||item.cat==='pant');var tagObj=null;var tagColor='var(--muted)';var tagLabel='No tag set';if(item.tag){if(isFabric){tagObj=FABRICS.find(function(f){return f.id===item.tag;});}else{tagObj=WEATHER_TAGS.find(function(w){return w.id===item.tag;});}if(tagObj){tagColor=tagObj.color;tagLabel=tagObj.label;}}var div=document.createElement('div');div.className='col-item';div.style.animationDelay=(i*0.05)+'s';div.innerHTML='<img src="'+item.src+'"><div class="col-item-info"><div class="col-item-cat">'+item.cat+'</div><div class="col-item-tag" style="color:'+tagColor+'">'+tagLabel+'</div></div>';grid.appendChild(div);});}
+function filterCol(filter,btn){document.querySelectorAll('.ctab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');renderCollections(filter);}
+function showToast(msg){var t=document.getElementById('toastEl');t.textContent=msg;t.classList.remove('on');void t.offsetWidth;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},3000);}
+</script>
+</body>
+</html>
